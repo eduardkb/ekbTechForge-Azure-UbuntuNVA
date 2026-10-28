@@ -63,3 +63,9 @@ Azure network infrastructure:
 		- Frontend IP address: public PIP (hubnva-pip)
 		- Protocol: All
 		- Backend Pool: hubnva-backend-pool
+
+
+## TODO
+- study NVA sh script
+- finish network watcher config in acme-apps
+- add web page to data vm

@@ -123,6 +123,26 @@ variable "data_vnet_cidr" {
   default     = "10.30.1.0/24"
 }
 
+variable "network_watcher_name" {
+  description = "central network watcher name from connectivity subscription"
+  type = string
+}
+
+variable "network_watcher_resource_group_name" {
+  description = "central network watcher RG name from connectivity subscription"
+  type = string
+}
+
+variable "flow_logs_storage_account_name" {
+  description = "central storage account name from connectivity subscription"
+  type = string
+}
+
+variable "flow_logs_storage_account_resource_group_name" {
+  description = "central storage RG name from connectivity subscription"
+  type = string
+}
+
 variable "admin_username" {
   description = "Linux administrator username."
   type        = string

@@ -18,3 +18,9 @@ deploy_vm = true
 # variables for custom route table
 nva_private_ip  = "10.0.1.10"
 data_vnet_cidr   = "10.30.1.0/24"
+
+# variables to create centralized network flow log for acme-app vnet
+network_watcher_name                            = "NetworkWatcher_southcentralus"
+network_watcher_resource_group_name             = "NetworkWatcherRG"
+flow_logs_storage_account_name                  = "stplatnetlogs0001"
+flow_logs_storage_account_resource_group_name   = "rg-platform-connectivity"

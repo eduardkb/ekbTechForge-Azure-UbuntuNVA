@@ -220,3 +220,32 @@ resource "azurerm_dev_test_global_vm_shutdown_schedule" "this" {
     enabled = false
   }
 }
+
+# Network Watcher
+# data "azurerm_network_watcher" "central" {
+#   name                = var.network_watcher_name
+#   resource_group_name = var.network_watcher_resource_group_name
+# }
+
+# data "azurerm_storage_account" "central" {
+#   name                = var.flow_logs_storage_account_name
+#   resource_group_name = var.flow_logs_storage_account_resource_group_name
+# }
+
+# resource "azurerm_network_watcher_flow_log" "this" {
+#   name                 = "${var.name_prefix}-vnet-flow-log"
+#   network_watcher_name = data.azurerm_network_watcher.central.name
+#   resource_group_name  = data.azurerm_network_watcher.central.resource_group_name
+#   location             = data.azurerm_network_watcher.central.location
+
+#   target_resource_id = azurerm_virtual_network.this.id
+#   storage_account_id = data.azurerm_storage_account.central.id
+
+#   enabled = true
+#   version = 2
+
+#   retention_policy {
+#     enabled = true
+#     days    = 7
+#   }
+# }

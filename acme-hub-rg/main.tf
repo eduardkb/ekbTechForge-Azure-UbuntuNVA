@@ -21,21 +21,21 @@ resource "azurerm_network_security_group" "hub_subnet" {
   resource_group_name = azurerm_resource_group.hub_nva.name
   tags                = var.tags
 
-  # security_rule {
-  #   name                       = "Deny-All-Inbound"
-  #   priority                   = 100
-  #   direction                  = "Inbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
+  security_rule {
+    name                       = "Allow-Spoke-Inbound"
+    priority                   = 500
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.0.0.0/8"
+    destination_address_prefix = "*"
+  }
 
   security_rule {
     name                       = "Allow-Internet-Egress"
-    priority                   = 100
+    priority                   = 500
     direction                  = "Outbound"
     access                     = "Allow"
     protocol                   = "*"

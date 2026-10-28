@@ -181,6 +181,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_password                  = var.admin_password
   disable_password_authentication = false
   network_interface_ids           = [azurerm_network_interface.this[0].id]
+  custom_data                     = base64encode(file("${path.module}/cloud-init.sh"))
   tags                            = var.tags
 
   admin_ssh_key {

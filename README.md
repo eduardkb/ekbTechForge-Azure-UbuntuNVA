@@ -67,5 +67,3 @@ Azure network infrastructure:
 
 ## TODO
 - study NVA sh script
-- finish network watcher config in acme-apps
-- add web page to data vm

@@ -67,3 +67,4 @@ Azure network infrastructure:
 
 ## TODO
 - study NVA sh script
+- build visual design and insert on readme.md

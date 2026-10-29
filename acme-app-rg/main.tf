@@ -26,77 +26,42 @@ resource "azurerm_network_security_group" "this" {
   resource_group_name = azurerm_resource_group.this.name
   tags                = var.tags
 
-  # security_rule {
-  #   name                       = "Allow-VNet-ICMP-In"
-  #   priority                   = 100
-  #   direction                  = "Inbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Icmp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
+  security_rule {
+    name                       = "Allow-ICMP-From-Data"
+    priority                   = 500
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Allow-VNet-HTTP-In"
-  #   priority                   = 110
-  #   direction                  = "Inbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Tcp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "80"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
+  security_rule {
+    name                       = "Deny-Inbound-From-Data"
+    priority                   = 550
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Deny-All-In"
-  #   priority                   = 4096
-  #   direction                  = "Inbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
+  security_rule {
+    name                       = "Allow-ICMP-To-Data"
+    priority                   = 500
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "10.30.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Allow-VNet-ICMP-Out"
-  #   priority                   = 100
-  #   direction                  = "Outbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Icmp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
-
-  # security_rule {
-  #   name                       = "Allow-VNet-HTTP-Out"
-  #   priority                   = 110
-  #   direction                  = "Outbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Tcp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "80"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
-
-  # security_rule {
-  #   name                       = "Deny-All-Out"
-  #   priority                   = 4096
-  #   direction                  = "Outbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
 }
 
 resource "azurerm_subnet_network_security_group_association" "this" {
@@ -222,10 +187,11 @@ resource "azurerm_dev_test_global_vm_shutdown_schedule" "this" {
 }
 
 # Network Watcher
-data "azurerm_network_watcher" "central" {
-  provider            = azurerm.hub
-  name                = var.network_watcher_name
-  resource_group_name = var.network_watcher_resource_group_name
+resource "azurerm_network_watcher" "application" {
+  name                = "NetworkWatcher_southcentralus"
+  location            = azurerm_virtual_network.this.location
+  resource_group_name = "NetworkWatcherRG"
+  tags                = var.tags
 }
 
 data "azurerm_storage_account" "central" {
@@ -236,12 +202,13 @@ data "azurerm_storage_account" "central" {
 
 resource "azurerm_network_watcher_flow_log" "this" {
   name                 = "${var.name_prefix}-vnet-flow-log"
-  network_watcher_name = data.azurerm_network_watcher.central.name
-  resource_group_name  = data.azurerm_network_watcher.central.resource_group_name
-  location             = data.azurerm_network_watcher.central.location
+  network_watcher_name = azurerm_network_watcher.application.name  
+  resource_group_name  = azurerm_network_watcher.application.resource_group_name
+  location             = azurerm_network_watcher.application.location
 
   target_resource_id = azurerm_virtual_network.this.id
   storage_account_id = data.azurerm_storage_account.central.id
+  tags               = var.tags
 
   enabled = true
   version = 2

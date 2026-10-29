@@ -12,7 +12,7 @@ vm_private_ip_address = "10.0.1.10"
 #       Standard_B2ts_v2    = 2vcpu 1ram  = USD 0.0125
 #       Standard_B2ls_v2    = 2vcpu 4ram  = USD 0.0499
 #       Standard_B2s_v2     = 2vcpu 8ram  = USD 0.0998
-vm_size   = "Standard_B2ls_v2"
+vm_size   = "Standard_B2ts_v2"
 
 # Add every internal destination range that must retain its original source IP.
 nat_excluded_cidrs = [

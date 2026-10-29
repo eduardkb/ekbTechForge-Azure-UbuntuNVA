@@ -26,77 +26,55 @@ resource "azurerm_network_security_group" "this" {
   resource_group_name = azurerm_resource_group.this.name
   tags                = var.tags
 
-  # security_rule {
-  #   name                       = "Allow-VNet-ICMP-In"
-  #   priority                   = 100
-  #   direction                  = "Inbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Icmp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
+  # Inbound rules
+  security_rule {
+    name                       = "Allow-Data-From-App"
+    priority                   = 500
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "10.30.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Allow-VNet-HTTP-In"
-  #   priority                   = 110
-  #   direction                  = "Inbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Tcp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "80"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
+  security_rule {
+    name                       = "Allow-ICMP-From-App"
+    priority                   = 550
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "10.30.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Deny-All-In"
-  #   priority                   = 4096
-  #   direction                  = "Inbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
+  # Outbound rules
+  security_rule {
+    name                       = "Allow-ICMP-To-App"
+    priority                   = 500
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Icmp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
 
-  # security_rule {
-  #   name                       = "Allow-VNet-ICMP-Out"
-  #   priority                   = 100
-  #   direction                  = "Outbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Icmp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
-
-  # security_rule {
-  #   name                       = "Allow-VNet-HTTP-Out"
-  #   priority                   = 110
-  #   direction                  = "Outbound"
-  #   access                     = "Allow"
-  #   protocol                   = "Tcp"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "80"
-  #   source_address_prefix      = "VirtualNetwork"
-  #   destination_address_prefix = "VirtualNetwork"
-  # }
-
-  # security_rule {
-  #   name                       = "Deny-All-Out"
-  #   priority                   = 4096
-  #   direction                  = "Outbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
+  security_rule {
+    name                       = "Deny-Outbound-To-App"
+    priority                   = 550
+    direction                  = "Outbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "this" {

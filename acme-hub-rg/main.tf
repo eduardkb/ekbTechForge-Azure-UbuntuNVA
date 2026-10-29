@@ -21,41 +21,115 @@ resource "azurerm_network_security_group" "hub_subnet" {
   resource_group_name = azurerm_resource_group.hub_nva.name
   tags                = var.tags
 
+  # Inbound rules
   security_rule {
-    name                       = "Allow-Spoke-Inbound"
+    name                       = "Allow-App-To-Data-In"
     priority                   = 500
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "10.0.0.0/8"
-    destination_address_prefix = "*"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "10.30.1.0/24"
   }
 
   security_rule {
-    name                       = "Allow-Internet-Egress"
+    name                       = "Allow-Data-To-App-In"
+    priority                   = 550
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
+
+  security_rule {
+    name                       = "Allow-App-Internet-In"
+    priority                   = 600
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "Internet"
+  }
+
+  security_rule {
+    name                       = "Allow-Data-Internet-In"
+    priority                   = 650
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "Internet"
+  }
+
+  # Outbound rules
+  security_rule {
+    name                       = "Allow-App-To-Data-Out"
     priority                   = 500
     direction                  = "Outbound"
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = "*"
+    source_address_prefix      = "10.20.1.0/24"
+    destination_address_prefix = "10.30.1.0/24"
+  }
+
+  security_rule {
+    name                       = "Allow-Data-To-App-Out"
+    priority                   = 550
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "10.20.1.0/24"
+  }
+
+  security_rule {
+    name                       = "Allow-App-Internet-Out"
+    priority                   = 600
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.20.1.0/24"
     destination_address_prefix = "Internet"
   }
 
-  # security_rule {
-  #   name                       = "Deny-All-Other-Outbound"
-  #   priority                   = 4096
-  #   direction                  = "Outbound"
-  #   access                     = "Deny"
-  #   protocol                   = "*"
-  #   source_port_range          = "*"
-  #   destination_port_range     = "*"
-  #   source_address_prefix      = "*"
-  #   destination_address_prefix = "*"
-  # }
+  security_rule {
+    name                       = "Allow-Data-Internet-Out"
+    priority                   = 650
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.30.1.0/24"
+    destination_address_prefix = "Internet"
+  }
+
+  security_rule {
+    name                       = "Allow-NVA-Internet-Out"
+    priority                   = 700
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "10.0.1.10"
+    destination_address_prefix = "Internet"
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "hub_subnet" {

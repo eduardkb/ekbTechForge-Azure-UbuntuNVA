@@ -1,6 +1,65 @@
 # acme-UbuntuNVA-Project
 
-## Project details and design:
+## Project design:
+
+![architecture](architecture/UbuntoNVA.drawio.png)
+
+## Network Rules Summary
+
+### Hub NSG 
+
+Attached to the hub subnet (`10.0.1.0/24`).
+
+| Rule | Priority | Direction | Access | Protocol | Source | Destination | Dest. Port |
+|---|---|---|---|---|---|---|---|
+| Allow-App-To-Data-In | 500 | Inbound | Allow | * | 10.20.1.0/24 | 10.30.1.0/24 | * |
+| Allow-Data-To-App-In | 550 | Inbound | Allow | * | 10.30.1.0/24 | 10.20.1.0/24 | * |
+| Allow-App-Internet-In | 600 | Inbound | Allow | * | 10.20.1.0/24 | Internet | * |
+| Allow-Data-Internet-In | 650 | Inbound | Allow | * | 10.30.1.0/24 | Internet | * |
+| Allow-App-To-Data-Out | 500 | Outbound | Allow | * | 10.20.1.0/24 | 10.30.1.0/24 | * |
+| Allow-Data-To-App-Out | 550 | Outbound | Allow | * | 10.30.1.0/24 | 10.20.1.0/24 | * |
+| Allow-App-Internet-Out | 600 | Outbound | Allow | * | 10.20.1.0/24 | Internet | * |
+| Allow-Data-Internet-Out | 650 | Outbound | Allow | * | 10.30.1.0/24 | Internet | * |
+| Allow-NVA-Internet-Out | 700 | Outbound | Allow | * | 10.0.1.10 | Internet | * |
+
+### Data NSG
+
+Attached to the Data spoke subnet (`10.30.1.0/24`).
+
+| Rule | Priority | Direction | Access | Protocol | Source | Destination | Dest. Port |
+|---|---|---|---|---|---|---|---|
+| Allow-Data-From-App | 500 | Inbound | Allow | TCP | 10.20.1.0/24 | 10.30.1.0/24 | 80 |
+| Allow-ICMP-From-App | 550 | Inbound | Allow | ICMP | 10.20.1.0/24 | 10.30.1.0/24 | * |
+| Allow-ICMP-To-App | 500 | Outbound | Allow | ICMP | 10.30.1.0/24 | 10.20.1.0/24 | * |
+| Deny-Outbound-To-App | 550 | Outbound | **Deny** | * | 10.30.1.0/24 | 10.20.1.0/24 | * |
+
+### App NSG 
+
+Attached to the App spoke subnet (`10.20.1.0/24`).
+
+| Rule | Priority | Direction | Access | Protocol | Source | Destination | Dest. Port |
+|---|---|---|---|---|---|---|---|
+| Allow-ICMP-From-Data | 500 | Inbound | Allow | ICMP | 10.30.1.0/24 | 10.20.1.0/24 | * |
+| Deny-Inbound-From-Data | 550 | Inbound | **Deny** | * | 10.30.1.0/24 | 10.20.1.0/24 | * |
+| Allow-ICMP-To-Data | 500 | Outbound | Allow | ICMP | 10.20.1.0/24 | 10.30.1.0/24 | * |
+
+### Data Route Table
+
+Associated with the Data spoke subnet.
+
+| Route | Address Prefix | Next Hop Type | Next Hop IP |
+|---|---|---|---|
+| toInternet | 0.0.0.0/0 | VirtualAppliance | 10.0.1.10 |
+| toAppVnet | 10.20.1.0/24 | VirtualAppliance | 10.0.1.10 |
+
+### App Route Table
+
+Associated with the App spoke subnet.
+
+| Route | Address Prefix | Next Hop Type | Next Hop IP |
+|---|---|---|---|
+| toInternet | 0.0.0.0/0 | VirtualAppliance | 10.0.1.10 |
+| toDataVnet | 10.30.1.0/24 | VirtualAppliance | 10.0.1.10 |
 
 ## Configure AZ with Service Principal
 
@@ -20,6 +79,7 @@ az login --service-principal \
 ## Deploying:
 
 - on the project's root folder execute each command one-by-one after terraform init for each one:
+- OBS: acme-data-rg must be the last one. it needs the hub to have internet access and instal its web server.
 ```sh
 terraform -chdir="acme-hub-rg" apply -auto-approve
 terraform -chdir="acme-app-rg" apply -auto-approve
@@ -67,4 +127,4 @@ Azure network infrastructure:
 
 ## TODO
 - study NVA sh script
-- build visual design and insert on readme.md
+- add private DNS for VM names resolution

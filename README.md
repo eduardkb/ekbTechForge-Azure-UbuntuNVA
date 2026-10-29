@@ -126,5 +126,4 @@ Azure network infrastructure:
 
 
 ## TODO
-- study NVA sh script
 - add private DNS for VM names resolution

@@ -92,27 +92,22 @@ Azure network infrastructure:
 - VNET: vnet-platform-hub
 	- SUBNET: snet-shared-services (CIDR: 10.0.1.0/24)
 		- subnet has NSG hubnva-subnet-nsg
-			- Internet egress Rule: Allow Source Any, Destination service tag: internet
 		- contains VM "hubnva-vm" with fixed private IP 10.0.1.10
 			- NIC with ip_forwarding_enabled = true
 		
 - VNET: acmeapp-vnet
 	- VNET is peered to vnet-platform-hub and both sides have "receive forwarding traffic" enabled
 	- SUBNET: acmeapp-subnet (CIDR: 10.20.1.0/24)
-		- subnet has NSG acmeapp-nsg with only default rules
+		- subnet has NSG acmeapp
 		- contains VM "acmeapp-vm" with dynamic private IP 10.20.1.4
-	- ROUTE TABLE: acmeapp-rt with rules:
-		- toDataVnet : 10.30.1.0/24 to 10.0.1.10
-		- toInternet: 0.0.0.0/0 to 10.0.1.10
+	- ROUTE TABLE: acmeapp-rt with rules
 	
 - VNET: acmedata-vnet
 	- VNET is peered to vnet-platform-hub and both sides have "receive forwarding traffic" enabled
 	- SUBNET: acmedata-subnet (CIDR: 10.30.1.0/24)
-		- subnet has NSG acmedata-nsg with only default rules
+		- subnet has NSG acmedata-nsg
 		- contains VM "acmedata-vm" with dynamic private IP 10.30.1.4
-	- ROUTE TABLE: acmedata-rt with rules:
-		- toAppVnet : 10.20.1.0/24 to 10.0.1.10
-		- toInternet: 0.0.0.0/0 to 10.0.1.10
+	- ROUTE TABLE: acmedata-rt
 		
 - PUBLIC LOAD BALANCER: hubnva-lb	
 	- Frontend IP Configuration: Public IP "hubnva-pip" with IP 20.97.116.99
@@ -124,6 +119,7 @@ Azure network infrastructure:
 		- Protocol: All
 		- Backend Pool: hubnva-backend-pool
 
-
-## TODO
-- add private DNS for VM names resolution
+- PRIVATE DNS ZONE: acme.internal
+  - linked with auto-registration to vnet-platform-hub, acmeapp-vnet and acmedata-vnet
+  - the zone and the hub link are created by acme-hub-rg; each spoke creates its own link
+  - VMs resolve each other by FQDN, e.g. acmedata-vm.acme.internal

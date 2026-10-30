@@ -22,3 +22,13 @@ output "hub_subnet_id" {
   description = "ID of the existing hub subnet hosting the NVA."
   value       = data.azurerm_subnet.hub.id
 }
+
+output "private_dns_zone_name" {
+  description = "Private DNS zone where VMs of all three VNets auto-register."
+  value       = azurerm_private_dns_zone.internal.name
+}
+
+output "private_dns_zone_id" {
+  description = "Resource ID of the private DNS zone."
+  value       = azurerm_private_dns_zone.internal.id
+}

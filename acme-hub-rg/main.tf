@@ -240,10 +240,25 @@ resource "azurerm_dev_test_global_vm_shutdown_schedule" "this" {
   enabled            = true
   tags               = var.tags
 
-  daily_recurrence_time = "1800"
+  daily_recurrence_time = "2000"
   timezone              = "E. South America Standard Time"
 
   notification_settings {
     enabled = false
   }
+}
+
+resource "azurerm_private_dns_zone" "internal" {
+  name                = var.private_dns_zone_name
+  resource_group_name = azurerm_resource_group.hub_nva.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "hub" {
+  name                  = "link-${data.azurerm_virtual_network.hub.name}"
+  resource_group_name   = azurerm_resource_group.hub_nva.name
+  private_dns_zone_name = azurerm_private_dns_zone.internal.name
+  virtual_network_id    = data.azurerm_virtual_network.hub.id
+  registration_enabled  = true
+  tags                  = var.tags
 }

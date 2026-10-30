@@ -24,3 +24,7 @@ network_watcher_name                            = "NetworkWatcher_southcentralus
 network_watcher_resource_group_name             = "NetworkWatcherRG"
 flow_logs_storage_account_name                  = "stplatnetlogs0001"
 flow_logs_storage_account_resource_group_name   = "rg-platform-connectivity"
+
+# private DNS - create link to acme-hub-rg's private dns zone
+hub_nva_resource_group_name = "rg-hub-nva"
+private_dns_zone_name       = "acme.internal"

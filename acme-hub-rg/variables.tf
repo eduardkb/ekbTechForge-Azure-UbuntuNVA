@@ -95,21 +95,6 @@ variable "os_disk_size_gb" {
   }
 }
 
-variable "nat_excluded_cidrs" {
-  description = "IPv4 destination ranges that must not be source-NATed. Add every spoke and other internal range, especially if it is not RFC1918."
-  type        = list(string)
-  default = [
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-  ]
-
-  validation {
-    condition     = alltrue([for cidr in var.nat_excluded_cidrs : can(cidrhost(cidr, 0))])
-    error_message = "Every nat_excluded_cidrs entry must be a valid IPv4 CIDR range."
-  }
-}
-
 variable "tags" {
   description = "Tags applied to the new resource group and NVA resources."
   type        = map(string)
@@ -131,4 +116,20 @@ variable "admin_password" {
   type        = string
   sensitive   = true
   default     = "AzUserP@ss01"
+}
+
+variable "private_dns_zone_name" {
+  description = "Private DNS zone created in the NVA resource group. VMs in the hub, application and data VNets auto-register here."
+  type        = string
+  default     = "acme.internal"
+
+  validation {
+    condition     = can(regex("^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$", var.private_dns_zone_name))
+    error_message = "private_dns_zone_name must be a lowercase DNS name with at least two labels, e.g. acme.internal."
+  }
+
+  validation {
+    condition     = !endswith(var.private_dns_zone_name, ".local")
+    error_message = "Do not use .local; it conflicts with mDNS on Linux."
+  }
 }

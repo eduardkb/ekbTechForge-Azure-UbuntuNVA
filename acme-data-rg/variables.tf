@@ -135,3 +135,19 @@ variable "admin_password" {
   sensitive   = true
   default     = "AzUserP@ss01"
 }
+
+variable "hub_nva_resource_group_name" {
+  description = "Resource group in the hub subscription that contains the private DNS zone (the NVA resource group created by acme-hub-rg)."
+  type        = string
+
+  validation {
+    condition     = length(trimspace(var.hub_nva_resource_group_name)) > 0
+    error_message = "hub_nva_resource_group_name must not be empty."
+  }
+}
+
+variable "private_dns_zone_name" {
+  description = "Name of the private DNS zone created by acme-hub-rg."
+  type        = string
+  default     = "acme.internal"
+}

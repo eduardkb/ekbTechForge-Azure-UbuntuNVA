@@ -18,3 +18,7 @@ deploy_vm = true
 # variables for custom route table
 nva_private_ip  = "10.0.1.10"
 app_vnet_cidr   = "10.20.1.0/24"
+
+# private DNS - create link to acme-hub-rg's private dns zone
+hub_nva_resource_group_name = "rg-hub-nva"
+private_dns_zone_name       = "acme.internal"

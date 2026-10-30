@@ -72,7 +72,7 @@ Associated with the App spoke subnet.
 ```sh
 az login --service-principal \
   --username "<CLIENT_ID>" \
-  --certificate ~/.az/mycert.pem \
+  --certificate ~/mycert.pem \
   --tenant "<TENANT_ID>"
 ```
 
